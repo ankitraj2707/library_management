@@ -1,0 +1,197 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../backend/node_modules/@prisma/client"
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+}
+
+enum IssueStatus {
+  ISSUED
+  RETURNED
+  OVERDUE
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ReservationStatus {
+  WAITING
+  NOTIFIED
+  FULFILLED
+  CANCELLED
+}
+
+enum FineStatus {
+  UNPAID
+  PAID
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String
+  role          Role           @default(STUDENT)
+  name          String
+  studentId     String?        @unique
+  department    String?
+  course        String?
+  semester      Int?
+  phone         String?
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  issues        BookIssue[]
+  requests      BookRequest[]
+  reservations  Reservation[]
+  fines         Fine[]
+  finePayments  FinePayment[]
+  notifications Notification[]
+
+  @@index([email])
+  @@index([studentId])
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  books       Book[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Book {
+  id              String        @id @default(uuid())
+  isbn            String        @unique
+  title           String
+  author          String
+  publisher       String
+  publicationYear Int
+  coverImage      String?
+  totalCopies     Int
+  availableCopies Int
+  categoryId      String
+  category        Category      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  issues          BookIssue[]
+  requests        BookRequest[]
+  reservations    Reservation[]
+
+  @@index([isbn])
+  @@index([title])
+  @@index([author])
+  @@index([categoryId])
+}
+
+model BookIssue {
+  id         String      @id @default(uuid())
+  bookId     String
+  book       Book        @relation(fields: [bookId], references: [id], onDelete: Restrict)
+  userId     String
+  user       User        @relation(fields: [userId], references: [id], onDelete: Restrict)
+  issueDate  DateTime    @default(now())
+  dueDate    DateTime
+  returnDate DateTime?
+  status     IssueStatus @default(ISSUED)
+  fine       Fine?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@index([bookId])
+  @@index([userId])
+  @@index([status])
+}
+
+model BookRequest {
+  id        String        @id @default(uuid())
+  bookId    String
+  book      Book          @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status    RequestStatus @default(PENDING)
+  notes     String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([bookId])
+  @@index([userId])
+}
+
+model Reservation {
+  id        String            @id @default(uuid())
+  bookId    String
+  book      Book              @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status    ReservationStatus @default(WAITING)
+  queuePos  Int               @default(1)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@index([bookId])
+  @@index([userId])
+}
+
+model Fine {
+  id        String       @id @default(uuid())
+  issueId   String       @unique
+  issue     BookIssue    @relation(fields: [issueId], references: [id], onDelete: Restrict)
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Restrict)
+  amount    Float
+  status    FineStatus   @default(UNPAID)
+  payment   FinePayment?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([userId])
+}
+
+model FinePayment {
+  id          String   @id @default(uuid())
+  fineId      String   @unique
+  fine        Fine     @relation(fields: [fineId], references: [id], onDelete: Restrict)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  amountPaid  Float
+  paymentDate DateTime @default(now())
+  receivedBy  String
+  receiptNo   String   @unique
+
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model LibrarySettings {
+  id                 Int      @id @default(1)
+  fineRatePerDay     Float    @default(5.0)
+  defaultBorrowDays  Int      @default(14)
+  maxBooksPerStudent Int      @default(4)
+  updatedAt          DateTime @updatedAt
+}

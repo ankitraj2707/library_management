@@ -1,0 +1,47 @@
+{
+  "name": "library_management",
+  "version": "1.0.0",
+  "description": "University Library Management System",
+  "main": "backend/src/server.js",
+  "scripts": {
+    "start": "node backend/src/server.js",
+    "dev": "nodemon backend/src/server.js",
+    "prisma:generate": "prisma generate --schema=./prisma/schema.prisma",
+    "prisma:migrate": "prisma migrate dev --name init --schema=./prisma/schema.prisma",
+    "prisma:seed": "node prisma/seed.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ankitraj2707/library_management.git"
+  },
+  "keywords": [
+    "library",
+    "management",
+    "postgresql",
+    "prisma",
+    "express",
+    "vanillajs"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ankitraj2707/library_management/issues"
+  },
+  "homepage": "https://github.com/ankitraj2707/library_management#readme",
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.2.0",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0",
+    "prisma": "^6.19.3"
+  }
+}

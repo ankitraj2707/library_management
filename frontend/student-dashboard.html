@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Dashboard - University Library</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <aside class="sidebar">
+        <div class="sidebar-brand">📖 Student Portal</div>
+        <ul class="sidebar-menu">
+          <li>
+            <a href="#" class="active" onclick="Student.navigate('overview')"
+              >Dashboard</a
+            >
+          </li>
+          <li>
+            <a href="#" onclick="Student.navigate('browse')">Browse Books</a>
+          </li>
+          <li>
+            <a href="#" onclick="Student.navigate('issues')">My Issued Books</a>
+          </li>
+          <li><a href="#" onclick="Student.navigate('fines')">My Fines</a></li>
+          <li><a href="#" onclick="Student.logout()">Logout</a></li>
+        </ul>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <h2>Student Dashboard</h2>
+          <span id="studentGreeting">Welcome</span>
+        </header>
+
+        <section class="content-body" id="dynamicStudentContent">
+          <!-- Injected via js/student.js -->
+        </section>
+      </main>
+    </div>
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/student.js"></script>
+  </body>
+</html>
